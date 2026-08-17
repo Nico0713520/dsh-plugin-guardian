@@ -1,0 +1,26 @@
+DSH plugin doctor
+target : /home/me/my-plugin
+verdict: FAIL  (2 blocker · 1 warn · 2 info)
+
+[blocker] confirmed — Missing dsh.bundle.patch declaration
+  DSH plugins must declare "dsh.bundle.patch" pointing at their cordis patch file,
+  otherwise the plugin installs but does not activate.
+  → Add "dsh": { "bundle": { "patch": "./cordis.patch.yml" } } and ship that file.
+
+[blocker] confirmed — package.json is missing "version"
+  Without a version, DSH cannot pin or resolve the plugin.
+  → Add a "version" field to package.json.
+
+[warn] confirmed — Pre-release peer dependencies (3)
+  DSH is in developer preview and releases breaking changes. Floating rc ranges can
+  drift: @deepseek-ai/dsh-tools@^0.1.0-rc.6, @deepseek-ai/dsh-agent@^0.1.0-rc.6,
+  @deepseek-ai/dsh-session@^0.1.0-rc.6.
+  → Pin these peer dependencies to the exact versions your plugin was tested against.
+
+[info] inferred — Spawns subprocesses
+  Source references child_process / exec / spawn. Verify it is sandboxed.
+  → Review the flagged code before trusting this plugin.
+
+[info] inferred — Detected 2 possible tool name(s)
+  Static scan found: fetch_price, report_weekly.
+  → Use plugin_profile_scan to check for collisions against the installed set.

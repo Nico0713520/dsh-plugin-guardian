@@ -1,0 +1,34 @@
+DSH profile scan
+profile: /home/me/.dsh/profiles/web
+plugins: 6
+result : FAIL  (3 blocker · 1 warn)
+
+  - @deepseek-ai/dsh-shell@0.1.0-rc.6
+  - @deepseek-ai/dsh-fs@0.1.0-rc.6
+  - dsh-plugin-guardian@0.1.0
+  - @linxin666/dsh-client-ui-skin-center@0.1.12 — tools: ui_skin, sidebar
+  - dsh-whale-appearance@0.1.0 — tools: ui_skin, desktop_pet
+  - community-tools@1.0.0 — tools: bash, my_custom_tool
+
+[blocker] inferred — Community plugin overrides an official tool: "bash"
+  "community-tools" appears to register a tool named "bash", which collides with a tool
+  shipped by the official DSH core. Overriding core tools can break the harness or
+  silently replace official behavior.
+  → Rename the tool in the community plugin, or confirm you intend to override the
+    official tool.
+
+[blocker] inferred — Possible tool name collision: "ui_skin"
+  Both "@linxin666/dsh-client-ui-skin-center" and "dsh-whale-appearance" appear to
+  register a tool named "ui_skin". Duplicate tool names can crash the harness at startup.
+  → Rename one tool, or uninstall one of the two plugins.
+
+[blocker] inferred — Community plugin overrides an official tool: "sidebar"
+  "@linxin666/dsh-client-ui-skin-center" appears to register a tool named "sidebar",
+  which collides with a tool shipped by the official DSH core.
+  → Rename the tool in the community plugin, or confirm you intend to override the
+    official tool.
+
+[warn] confirmed — Plugins span multiple dsh-tools versions
+  Installed plugins report different dependency versions: 0.1.0-rc.6: @deepseek-ai/dsh-shell,
+  @deepseek-ai/dsh-fs | 0.0.1-rc.1: community-tools.
+  → Consider aligning versions to reduce incompatibility risk.

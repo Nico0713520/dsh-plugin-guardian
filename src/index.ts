@@ -52,8 +52,9 @@ export function apply(ctx: Context, config: GuardianConfig = {}): void {
     name: 'plugin_profile_scan',
     description: [
       'Scan the installed plugin set of a DeepSeek Harness profile and surface cross-plugin conflicts,',
-      'especially duplicate tool-name registrations that can crash the harness at startup. Also flags',
-      'duplicate plugin entries and dependency version skew. Read-only: only reads package.json and source.',
+      'especially duplicate tool-name registrations that can crash the harness at startup. Also detects',
+      'community plugins that override official DSH core tools, duplicate plugin entries, and dependency',
+      'version skew. Read-only: only reads package.json and source.',
       'By default scans $DSH_HOME/profiles/web; override with the "profileDir" argument or plugin config.',
     ].join(' '),
     parameters: {

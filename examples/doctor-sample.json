@@ -1,0 +1,39 @@
+{
+  "target": "/home/me/my-plugin",
+  "resolvedPath": "/home/me/my-plugin",
+  "verdict": "warn",
+  "summary": {
+    "blockers": 0,
+    "warnings": 1,
+    "infos": 1
+  },
+  "manifest": {
+    "name": "my-plugin",
+    "version": "0.1.0",
+    "dshPatch": "./cordis.patch.yml",
+    "main": "dist/index.mjs",
+    "peerDependencies": {
+      "@deepseek-ai/dsh-tools": "^0.1.0-rc.6"
+    }
+  },
+  "patchFileExists": true,
+  "toolNames": ["fetch_price", "report_weekly"],
+  "findings": [
+    {
+      "id": "prerelease-peers",
+      "confidence": "confirmed",
+      "severity": "warn",
+      "title": "Pre-release peer dependencies (1)",
+      "detail": "DSH is in developer preview and releases breaking changes. Floating rc ranges can drift: @deepseek-ai/dsh-tools@^0.1.0-rc.6.",
+      "suggestion": "Pin these peer dependencies to the exact versions your plugin was tested against."
+    },
+    {
+      "id": "tool-names-detected",
+      "confidence": "inferred",
+      "severity": "info",
+      "title": "Detected 2 possible tool name(s)",
+      "detail": "Static scan found: fetch_price, report_weekly.",
+      "suggestion": "Use plugin_profile_scan to check for collisions against the installed set."
+    }
+  ]
+}
