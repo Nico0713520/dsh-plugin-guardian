@@ -27,12 +27,14 @@ DeepSeek Harness is *"everything is a plugin"*, and the ecosystem exploded to th
 | "Is this random npm plugin safe?" | No trust system exists | `plugin_doctor` checks it, with honest confidence tiers |
 | "The plugin my agent just wrote is gone" | Creator-mode plugins live only in memory | `plugin_promote` promotes it to durable disk |
 
-## Three tools, one lifecycle
+## Four tools, one lifecycle
 
 ```
 陌生/临时插件  →  plugin_doctor 体检  →  通过门禁  →  plugin_promote 转正  →  可信磁盘插件
                         │
                  plugin_profile_scan 扫已装集冲突
+                        │
+                 plugin_install 引导安装（先审计→再执行）
 ```
 
 | Tool | What it does | Analogy |
@@ -40,6 +42,7 @@ DeepSeek Harness is *"everything is a plugin"*, and the ecosystem exploded to th
 | `plugin_doctor` | Health-check a single plugin directory | 门诊 checkup |
 | `plugin_profile_scan` | Scan the installed set for cross-plugin conflicts | 体检 center |
 | `plugin_promote` | Turn an ephemeral plugin into a durable, versioned asset | 落户 registration |
+| `plugin_install` | Guided install: audit first, then execute | 一键安装 one-click install |
 
 ## What makes it honest: three-tier confidence
 
@@ -64,6 +67,8 @@ dsh plugin --profile web add github:Nico0713520/dsh-plugin-guardian
 plugin_doctor target="/path/to/my-plugin"
 plugin_profile_scan
 plugin_promote source="/path/to/my-plugin"
+plugin_install spec="npm:some-plugin"      # audit-only by default
+plugin_install spec="npm:some-plugin" approve=true
 ```
 
 ## Demo
@@ -103,6 +108,7 @@ install: dsh plugin --profile web add link:…/.guardian-plugins/dsh-gh-cli-6cf1
 | `plugin_doctor` | `target` (path or `npm:`/`github:` spec), `format` (`text`/`json`) | Three-tier confidence report |
 | `plugin_profile_scan` | `profileDir` (defaults to `$DSH_HOME/profiles/web`) | Finds tool-name collisions, dupes, version skew |
 | `plugin_promote` | `source`, `register` (default false), `profile`, `outputDir` | Doctor-gated, atomic, provenance-marked |
+| `plugin_install` | `spec`, `approve` (default false), `profile` | Audit-first guided install; `approve=true` runs `dsh plugin add` |
 
 ## FAQ
 

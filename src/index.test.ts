@@ -25,10 +25,15 @@ describe('plugin entry', () => {
     expect(inject).toContain('tools')
   })
 
-  it('registers all three tools when applied', () => {
+  it('registers all four tools when applied', () => {
     const { ctx, registered } = makeMockContext()
     apply(ctx)
-    expect(registered.map((tool) => tool.name)).toEqual(['plugin_doctor', 'plugin_profile_scan', 'plugin_promote'])
+    expect(registered.map((tool) => tool.name)).toEqual([
+      'plugin_doctor',
+      'plugin_profile_scan',
+      'plugin_promote',
+      'plugin_install',
+    ])
     for (const tool of registered) {
       expect(tool.description?.length).toBeGreaterThan(20)
       expect(typeof tool.execute).toBe('function')
@@ -38,6 +43,6 @@ describe('plugin entry', () => {
   it('survives an apply with explicit config', () => {
     const { ctx, registered } = makeMockContext()
     apply(ctx, { profileDir: '/tmp/profile' })
-    expect(registered).toHaveLength(3)
+    expect(registered).toHaveLength(4)
   })
 })

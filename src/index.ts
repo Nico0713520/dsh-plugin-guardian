@@ -3,6 +3,7 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 import { formatReport, formatReportJson, inspectPlugin } from './doctor.ts'
 import { formatProfileReport, scanProfile } from './profile.ts'
 import { formatPromoteResult, promotePlugin } from './promote.ts'
+import { formatInstallResult, installPlugin } from './install.ts'
 
 export const name = 'plugin-guardian'
 export const inject = ['tools']
@@ -120,6 +121,45 @@ export function apply(ctx: Context, config: GuardianConfig = {}): void {
         outputDir: params.outputDir,
       })
       return formatPromoteResult(result)
+    },
+  }))
+
+  ctx.tools.register(defineTool({
+    name: 'plugin_install',
+    description: [
+      'Guided install: audit first, then execute. Takes a plugin spec (a local directory path, "npm:name",',
+      'or "github:owner/repo"), audits it (local path runs the full doctor; npm specs query registry metadata',
+      'read-only), and reports the verdict. It only runs `dsh plugin add` when approve=true is passed.',
+      'Default (approve=false) is audit-only and writes nothing — return the report and the exact install',
+      'command so the user can confirm before installing. If the audit finds blockers, approve=true is refused.',
+      'Use this as the "one-click guided install" capability behind a catalog entry.',
+    ].join(' '),
+    parameters: {
+      spec: {
+        type: 'string',
+        required: true,
+        description: 'Plugin spec: a local directory path, "npm:name", or "github:owner/repo".',
+      },
+      approve: {
+        type: 'boolean',
+        description: 'Approve the install and run `dsh plugin add`. Defaults to false (audit only).',
+      },
+      profile: {
+        type: 'string',
+        description: 'DSH profile name. Defaults to "web".',
+      },
+    },
+    output: {
+      schema: { type: 'string' },
+      render: (_args, value) => [{ type: 'text', text: value }],
+    },
+    async execute(params: { spec: string; approve?: boolean; profile?: string }) {
+      const result = await installPlugin({
+        spec: params.spec,
+        approve: params.approve,
+        profile: params.profile,
+      })
+      return formatInstallResult(result)
     },
   }))
 }
