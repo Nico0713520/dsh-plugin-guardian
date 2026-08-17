@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import {
   detectDuplicatePlugins,
+  detectOfficialToolOverrides,
   detectToolCollisions,
   detectVersionSkew,
   scanProfile,
@@ -52,6 +53,28 @@ describe('detectDuplicatePlugins', () => {
   it('flags a plugin declared twice', () => {
     const findings = detectDuplicatePlugins([plugin('a', []), plugin('a', [])])
     expect(findings.some((f) => f.id === 'duplicate-plugin-a')).toBe(true)
+  })
+})
+
+describe('detectOfficialToolOverrides', () => {
+  it('flags a community plugin that registers an official tool name', () => {
+    const findings = detectOfficialToolOverrides([plugin('community-skin', ['bash'])])
+    expect(findings.some((f) => f.id === 'official-tool-override-bash' && f.severity === 'blocker')).toBe(true)
+  })
+
+  it('normalizes dash vs underscore tool names', () => {
+    const findings = detectOfficialToolOverrides([plugin('community-x', ['ask-user'])])
+    expect(findings.some((f) => f.id === 'official-tool-override-ask-user')).toBe(true)
+  })
+
+  it('ignores tools that are not in the official set', () => {
+    const findings = detectOfficialToolOverrides([plugin('community-y', ['my_custom_tool'])])
+    expect(findings).toEqual([])
+  })
+
+  it('does not flag the official packages themselves', () => {
+    const findings = detectOfficialToolOverrides([plugin('@deepseek-ai/dsh-shell', ['bash'])])
+    expect(findings).toEqual([])
   })
 })
 

@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { extractToolNames, listSourceFiles, type Finding } from './doctor.ts'
+import { isOfficialPackage, normalizeToolName, OFFICIAL_TOOL_NAMES } from './baseline.ts'
 
 /**
  * Scan a DeepSeek Harness profile's installed plugin set and surface
@@ -101,6 +102,7 @@ export async function scanProfile(profileDir: string): Promise<ProfileReport> {
   report.plugins = plugins
 
   report.findings.push(...detectToolCollisions(plugins))
+  report.findings.push(...detectOfficialToolOverrides(plugins))
   report.findings.push(...detectDuplicatePlugins(plugins))
   report.findings.push(...detectVersionSkew(plugins))
 
@@ -129,6 +131,26 @@ export function detectToolCollisions(plugins: ProfilePlugin[]): Finding[] {
     }
   }
 
+  return findings
+}
+
+export function detectOfficialToolOverrides(plugins: ProfilePlugin[]): Finding[] {
+  const findings: Finding[] = []
+  for (const plugin of plugins) {
+    if (isOfficialPackage(plugin.name)) continue
+    for (const tool of plugin.toolNames) {
+      if (OFFICIAL_TOOL_NAMES.has(normalizeToolName(tool))) {
+        findings.push({
+          id: `official-tool-override-${tool}`,
+          confidence: 'inferred',
+          severity: 'blocker',
+          title: `Community plugin overrides an official tool: "${tool}"`,
+          detail: `"${plugin.name}" appears to register a tool named "${tool}", which collides with a tool shipped by the official DSH core. Overriding core tools can break the harness or silently replace official behavior.`,
+          suggestion: 'Rename the tool in the community plugin, or confirm you intend to override the official tool.',
+        })
+      }
+    }
+  }
   return findings
 }
 
