@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in this file, following [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), with versions following [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- `plugin_install` tool: guided install — audit a spec first (local path runs the full doctor, `npm:` specs query registry metadata read-only), report the verdict, and only run `dsh plugin add` when `approve=true` (default false). Blocks on audit blockers. Fills the "one-click guided install behind a catalog entry" capability.
+- Official baseline detection in `plugin_profile_scan`: flags community plugins that register tool names colliding with official DSH core tools (e.g. `bash`, `read`, `web_search`), pinned to DSH `0.1.0-rc.6` (`src/baseline.ts`).
+- `examples/` sample outputs for `plugin_doctor` and `plugin_profile_scan`.
+
 ## [0.1.0] - 2026-08-18
 
 ### Added

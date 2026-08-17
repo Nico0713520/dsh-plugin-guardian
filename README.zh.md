@@ -27,19 +27,22 @@ DeepSeek Harness 信奉「一切皆插件」，一周内生态就膨胀到几千
 | 「这个野 npm 插件安全吗？」 | 没有任何信任体系 | `plugin_doctor` 三档置信度体检 |
 | 「Agent 刚写的插件没了」 | 创造模式插件只存内存 | `plugin_promote` 一键转正落盘 |
 
-## 三个工具，一条生命周期
+## 四个工具，一条生命周期
 
 ```
 陌生/临时插件  →  plugin_doctor 体检  →  通过门禁  →  plugin_promote 转正  →  可信磁盘插件
                         │
                  plugin_profile_scan 扫已装集冲突
+                        │
+                 plugin_install 引导安装（先审计→再执行）
 ```
 
 | 工具 | 作用 | 类比 |
 |---|---|---|
 | `plugin_doctor` | 单插件体检 | 门诊 |
-| `plugin_profile_scan` | 已装集冲突扫描 | 体检中心 |
+| `plugin_profile_scan` | 已装集冲突扫描（含官方核心工具被顶替检测） | 体检中心 |
 | `plugin_promote` | 临时插件转正 | 落户 |
+| `plugin_install` | 引导安装：先审计、再执行 | 一键安装 |
 
 ## 它凭什么可信：三档置信度
 
@@ -64,6 +67,8 @@ dsh plugin --profile web add github:Nico0713520/dsh-plugin-guardian
 plugin_doctor target="/path/to/my-plugin"
 plugin_profile_scan
 plugin_promote source="/path/to/my-plugin"
+plugin_install spec="npm:some-plugin"      # 默认只审计，不安装
+plugin_install spec="npm:some-plugin" approve=true
 ```
 
 ## 演示
