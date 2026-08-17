@@ -2,6 +2,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { formatReport, formatReportJson, inspectPlugin } from './doctor.ts'
 import { formatProfileReport, scanProfile } from './profile.ts'
+import { formatPromoteResult, promotePlugin } from './promote.ts'
 
 export const name = 'plugin-guardian'
 export const inject = ['tools']
@@ -74,6 +75,50 @@ export function apply(ctx: Context, config: GuardianConfig = {}): void {
       }
       const report = await scanProfile(dir)
       return formatProfileReport(report)
+    },
+  }))
+
+  ctx.tools.register(defineTool({
+    name: 'plugin_promote',
+    description: [
+      'Promote (转正) a plugin from a source directory into a durable, validated, versioned location.',
+      'Runs the doctor as a gate first: if blockers are found, the promotion is blocked and the blockers are',
+      'reported. On success it copies the source into a managed staging directory, writes a provenance marker',
+      '(owner/schema/sha256/promotedAt/source), and returns the exact `dsh plugin add` command to register it.',
+      'Safe by default: it never modifies the live profile unless register=true is passed.',
+      'Pass a local directory path as "source". Use "register=true" to also run `dsh plugin add` automatically.',
+    ].join(' '),
+    parameters: {
+      source: {
+        type: 'string',
+        required: true,
+        description: 'Local plugin directory to promote.',
+      },
+      register: {
+        type: 'boolean',
+        description: 'Also run `dsh plugin add` to register the staged plugin. Defaults to false.',
+      },
+      profile: {
+        type: 'string',
+        description: 'DSH profile name. Defaults to "web".',
+      },
+      outputDir: {
+        type: 'string',
+        description: 'Root dir for promoted plugins. Defaults to $DSH_HOME/.guardian-plugins.',
+      },
+    },
+    output: {
+      schema: { type: 'string' },
+      render: (_args, value) => [{ type: 'text', text: value }],
+    },
+    async execute(params: { source: string; register?: boolean; profile?: string; outputDir?: string }) {
+      const result = await promotePlugin({
+        source: params.source,
+        register: params.register,
+        profile: params.profile,
+        outputDir: params.outputDir,
+      })
+      return formatPromoteResult(result)
     },
   }))
 }
